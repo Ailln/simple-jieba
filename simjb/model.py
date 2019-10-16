@@ -7,13 +7,13 @@ class Tokenizer(object):
     def __init__(self):
         self.dict_path = ["simjb", "src/dict.txt"]
         self.re_cn = re.compile("([\u4E00-\u9FD5a-zA-Z0-9+#&._%-]+)", re.U)
-        self.re_eng = re.compile("[a-zA-Z0-9]", re.U)
+        self.re_en = re.compile("[a-zA-Z0-9]", re.U)
         self.freq_dict, self.freq_total = self._get_freq_dict()
 
     def _get_freq_dict(self):
-        stream = resource_stream(*self.dict_path)
         freq_dict = {}
         freq_total = 0
+        stream = resource_stream(*self.dict_path)
         for line in stream.readlines():
             word, freq = line.decode("utf-8").split(" ")[:2]
             freq = int(freq)
@@ -47,7 +47,7 @@ class Tokenizer(object):
             word_index_end = route[word_index][1] + 1
             word = sentence[word_index:word_index_end]
             # 匹配出英文
-            if self.re_eng.match(word) and len(word) == 1:
+            if self.re_en.match(word) and len(word) == 1:
                 word_buf += word
                 word_index = word_index_end
             else:

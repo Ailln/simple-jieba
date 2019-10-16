@@ -17,21 +17,21 @@ def calc(datas, data_name, tool_name, tool):
     false_num = 0
 
     for data in datas:
-        sentence_list = data.split("  ")
+        sentence_list = data.strip().split("  ")
         predict_list = list(tool.cut("".join(sentence_list)))
 
         sentence_pos_list = []
         sentence_len = 0
         for word in sentence_list:
             word_len = len(word)
-            sentence_pos_list.append([sentence_len, sentence_len+word_len])
+            sentence_pos_list.append([sentence_len, sentence_len + word_len])
             sentence_len += word_len
 
         predict_pos_list = []
         predict_len = 0
         for word in predict_list:
             word_len = len(word)
-            predict_pos_list.append([predict_len, predict_len+word_len])
+            predict_pos_list.append([predict_len, predict_len + word_len])
             predict_len += word_len
 
         true_word_num = 0
@@ -45,8 +45,9 @@ def calc(datas, data_name, tool_name, tool):
         all_num += len(sentence_pos_list)
         true_num += true_word_num
         false_num += false_word_num
-    print(
-        f"\n## {data_name} | {tool_name}\n>> all: {all_num}, true: {true_num}, false: {false_num}, acc: {true_num/all_num}")
+
+    print(f"\n## {data_name} | {tool_name}")
+    print(f">> all: {all_num}, true: {true_num}, false: {false_num}, acc: {true_num / all_num}")
 
 
 def run():
