@@ -246,7 +246,7 @@ jieba 分词本身要比这个更复杂，除了上文用到的技术，它还�
 $ pip install simjb
 
 # 或者
-$ git clone https://github.com/HaveTwoBrush/simple-jieba.git
+$ git clone https://github.com/Ailln/simple-jieba.git
 cd simple-jieba
 python setup.py install
 ```
@@ -272,6 +272,6 @@ print(result)
 - [中文分词工具探析（二）：Jieba](https://www.cnblogs.com/en-heng/p/6234006.html)
 - [结巴分词2--基于前缀词典及动态规划实现分词](https://www.cnblogs.com/zhbzz2007/p/6084196.html)
 - [不用Trie，减少内存加快速度；优化代码细节](https://github.com/fxsjy/jieba/pull/187)
-- [中文分词相关资料](https://github.com/HaveTwoBrush/nlp-roadmap#1-%E5%88%86%E8%AF%8D-word-segmentation)
+- [中文分词相关资料](https://github.com/Ailln/nlp-roadmap#1-%E5%88%86%E8%AF%8D-word-segmentation)
 - [如何从模板创建仓库？](https://help.github.com/cn/articles/creating-a-repository-from-a-template)
 - [如何发布自己的包到 pypi ？](https://www.v2ai.cn/python/2018/07/30/PY-1.html)
