@@ -1,6 +1,29 @@
 # Simple Jieba
 
-✂️ 用 [100](./simjb/model.py) 行实现简单版本的 [jieba](https://github.com/fxsjy/jieba) 分词。
+✂️ 用 [100](simjb/token.py) 行实现简单版本的 [jieba](https://github.com/fxsjy/jieba) 分词。
+
+## 使用方法
+
+### 安装
+
+```bash
+pip install simjb
+
+# 或者
+git clone https://github.com/Ailln/simple-jieba.git
+cd simple-jieba
+python setup.py install
+```
+
+### 使用
+
+```python
+import simjb
+
+result = simjb.cut("为中华之崛起而读书！")
+print(result)
+# ['为', '中华', '之', '崛起', '而', '读书', '！']
+```
 
 ## 性能对比
 
@@ -237,29 +260,6 @@ def cut_util(self, sentence):
 ```
 
 jieba 分词本身要比这个更复杂，除了上文用到的技术，它还使用了 HMM 对未登陆词进行了处理，感兴趣的可以去阅读源码。
-
-## 使用方法
-
-### 安装
-
-```bash
-$ pip install simjb
-
-# 或者
-$ git clone https://github.com/Ailln/simple-jieba.git
-cd simple-jieba
-python setup.py install
-```
-
-### 使用
-
-```python
-import simjb
-
-result = simjb.cut("为中华之崛起而读书！")
-print(result)
-# ['为', '中华', '之', '崛起', '而', '读书', '！']
-```
 
 ## 许可证
 

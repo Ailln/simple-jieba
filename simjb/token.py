@@ -95,6 +95,3 @@ class Tokenizer(object):
             route[sen_index] = max(freq_list)
         return route
 
-
-t = Tokenizer()
-cut = t.cut

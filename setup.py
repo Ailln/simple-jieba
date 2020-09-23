@@ -1,19 +1,18 @@
 from setuptools import setup
 from setuptools import find_packages
 
-from simjb import version
-
 NAME = "simjb"
+VERSION = "0.1.2"
 AUTHOR = "Ailln"
 EMAIL = "kinggreenhall@gmail.com"
-URL = "https://github.com/HaveTwoBrush/simple-jieba"
+URL = "https://github.com/Ailln/simple-jieba"
 LICENSE = "MIT License"
 DESCRIPTION = "A simple version of jieba."
 
 if __name__ == "__main__":
     setup(
         name=NAME,
-        version=version.VERSION,
+        version=VERSION,
         author=AUTHOR,
         author_email=EMAIL,
         url=URL,
@@ -24,13 +23,8 @@ if __name__ == "__main__":
         install_requires=open("./requirements.txt", "r").read().splitlines(),
         long_description=open("./README.md", "r").read(),
         long_description_content_type='text/markdown',
-        entry_points={
-            "console_scripts": [
-                "simjb=simjb.shell:run"
-            ]
-        },
         package_data={
-            "simjb": ["src/*.txt"]
+            "": ["src/*.txt"]
         },
         zip_safe=True,
         classifiers=[

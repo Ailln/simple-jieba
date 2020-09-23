@@ -1,11 +1,10 @@
-from . import shell
-from . import version
-from .model import cut
+from .token import Tokenizer
 
-__version__ = version.VERSION
+cut = Tokenizer().cut
+
+__version__ = "0.1.2"
 
 __all__ = [
-    "shell",
-    "version",
+    "__version__",
     "cut"
 ]

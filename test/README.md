@@ -3,21 +3,21 @@
 ## 1. 安装依赖
 
 ```bash
-$ cd simple-jieba/test
-$ pip install -r requirements.txt
+cd simple-jieba/test
+pip install -r requirements.txt
 ```
 
 ## 2. 下载数据集
 
 ```bash
-$ wget http://sighan.cs.uchicago.edu/bakeoff2005/data/icwb2-data.zip
-$ unzip icwb2-data.zip
+wget http://sighan.cs.uchicago.edu/bakeoff2005/data/icwb2-data.zip
+unzip icwb2-data.zip
 ```
 
 ## 3. 运行
 
 ```bash
-$ python test_jieba_and_simjb.py
+python a_test_for_jieba_and_simjb.py
 
 Building prefix dict from the default dictionary ...
 Loading model from cache /var/folders/dn/0w0vd2hd5m7byx0t73yxrt700000gn/T/jieba.cache

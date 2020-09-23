@@ -113,5 +113,5 @@ files.txt
 .vscode
 
 # test
-icwb2-data/
-icwb2-data.zip
+test/icwb2-data/
+test/icwb2-data.zip
