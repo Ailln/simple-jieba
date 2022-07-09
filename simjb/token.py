@@ -1,53 +1,56 @@
 import re
-from math import log
+import math
+from typing import Dict, List, Tuple
+from time import perf_counter
 from pkg_resources import resource_stream
 
 
 class Tokenizer(object):
-    def __init__(self):
+    def __init__(self) -> None:
         self.dict_path = ["simjb", "src/dict.txt"]
-        self.re_cn = re.compile("([\u4E00-\u9FD5a-zA-Z0-9+#&._%-]+)", re.U)
-        self.re_en = re.compile("[a-zA-Z0-9]", re.U)
-        self.freq_dict, self.freq_total = self._get_freq_dict()
+        self.normal_ptn = re.compile(r"([\u4E00-\u9FD5a-zA-Z\d+#&._%-]+)", re.U)
+        self.en_ptn = re.compile(r"[a-zA-Z\d]", re.U)
+        self.freq_dict = {}
+        self.freq_total = 0
 
-    def _get_freq_dict(self):
-        freq_dict = {}
-        freq_total = 0
-        stream = resource_stream(*self.dict_path)
-        for line in stream.readlines():
-            word, freq = line.decode("utf-8").split(" ")[:2]
-            freq = int(freq)
-            freq_dict[word] = freq
-            freq_total += freq
-            for word_index in range(len(word)):
-                word_frag = word[:word_index + 1]
-                if word_frag not in freq_dict:
-                    freq_dict[word_frag] = 0
-        return freq_dict, freq_total
+        self.__init_freq_dict()
 
-    def cut(self, sentence):
-        block_list = self.re_cn.split(sentence)
-        cut_result_list = []
-        for block in block_list:
-            # 跳过空的 block
-            if not block:
-                continue
-            if self.re_cn.match(block):
-                cut_result_list.extend(self.cut_util(block))
-            else:
-                cut_result_list.append(block)
-        return cut_result_list
+    def cut(self, sentence: str) -> list:
+        if type(sentence) != str:
+            raise TypeError("sentence must be str!")
 
-    def cut_util(self, sentence):
-        word_index = 0
-        word_buf = ""
+        # 以非标点符号分割句子
+        text_blocks = self.normal_ptn.split(sentence)
+        cut_result = []
+        for index, block in enumerate(text_blocks):
+            if len(block) > 0:
+                if index % 2 == 0:
+                    cut_result.append(block)
+                else:
+                    cut_result.extend(self.__cut_util(block))
+        return cut_result
+
+    def add_word(self, word: str, freq: int = 1000) -> None:
+        self.freq_total += freq
+        self.freq_dict[word] = freq
+
+        # 为了让 dag 能够正常生成，需要将 word 的前缀字符串也加入到 freq_dict 中
+        self.__add_prefix_word_to_dict(word)
+
+    def del_word(self, word: str) -> None:
+        self.freq_total -= self.freq_dict[word]
+        self.freq_dict[word] = 0
+
+    def __cut_util(self, sentence: str) -> list:
+        route = self.__calc_route_with_dp(sentence)
         result = []
-        route = self._calc_dag_with_dp(sentence)
+        word_buf = ""
+        word_index = 0
         while word_index < len(sentence):
-            word_index_end = route[word_index][1] + 1
+            word_index_end = route[word_index][0] + 1
             word = sentence[word_index:word_index_end]
             # 匹配出英文
-            if self.re_en.match(word) and len(word) == 1:
+            if self.en_ptn.match(word) and len(word) == 1:
                 word_buf += word
                 word_index = word_index_end
             else:
@@ -57,41 +60,54 @@ class Tokenizer(object):
                 else:
                     result.append(word)
                     word_index = word_index_end
-        # 纯英文
         if word_buf:
             result.append(word_buf)
         return result
 
-    def _get_dag(self, sentence):
+    def __calc_route_with_dp(self, sentence: str) -> Dict[int, Tuple[int, int]]:
+        dag = self.__build_dag(sentence)
+        sen_len = len(sentence)
+        route = {sen_len: (0, 0)}
+        # 取 log 防止数值下溢；取 log(1)=0 解决 log(0) 无定义问题
+        log_total = math.log(self.freq_total or 1)
+        for sen_index in reversed(range(sen_len)):
+            freq_score = {}
+            for word_index in dag[sen_index]:
+                word_freq = self.freq_dict.get(sentence[sen_index:word_index + 1])
+                freq_score[word_index] = math.log(word_freq or 1) - log_total + route[word_index+1][1]
+            route[sen_index] = max(freq_score.items(), key=lambda x: x[1])
+        return route
+
+    def __build_dag(self, sentence: str) -> Dict[int, List[int]]:
         dag = {}
         sen_len = len(sentence)
         for i in range(sen_len):
-            temp_list = []
+            word_index_list = []
             j = i
-            frag = sentence[i]
-            while j < sen_len and frag in self.freq_dict:
-                if self.freq_dict[frag]:
-                    temp_list.append(j)
+            fragment = sentence[i]
+            while j < sen_len and fragment in self.freq_dict.keys():
+                if self.freq_dict[fragment] > 0:
+                    word_index_list.append(j)
                 j += 1
-                frag = sentence[i:j + 1]
-            if not temp_list:
-                temp_list.append(i)
-            dag[i] = temp_list
+                fragment = sentence[i:j+1]
+            if not word_index_list:
+                word_index_list.append(i)
+            dag[i] = word_index_list
         return dag
 
-    def _calc_dag_with_dp(self, sentence):
-        dag = self._get_dag(sentence)
-        sen_len = len(sentence)
-        route = {sen_len: (0, 0)}
-        # 取 log 防止数值下溢
-        log_total = log(self.freq_total)
-        for sen_index in reversed(range(sen_len)):
-            freq_list = []
-            for word_index in dag[sen_index]:
-                word_freq = self.freq_dict.get(sentence[sen_index:word_index + 1])
-                # 解决 log(0) 无定义问题, 则取 log(1)=0
-                freq_index = (log(word_freq or 1) - log_total + route[word_index + 1][0], word_index)
-                freq_list.append(freq_index)
-            route[sen_index] = max(freq_list)
-        return route
+    def __init_freq_dict(self) -> None:
+        start_time = perf_counter()
+        with resource_stream(*self.dict_path) as stream:
+            for line in stream.readlines():
+                word, freq, _ = line.decode("utf-8").split(" ")
+                self.freq_dict[word] = int(freq)
+                self.freq_total += int(freq)
+                self.__add_prefix_word_to_dict(word)
+        end_time = perf_counter()
+        print(f"[simjb] load freq_dict cost: {end_time - start_time:.2f}s")
 
+    def __add_prefix_word_to_dict(self, word: str) -> None:
+        for word_index in range(len(word)-1):
+            word_frag = word[:word_index + 1]
+            if word_frag not in self.freq_dict.keys():
+                self.freq_dict[word_frag] = 0

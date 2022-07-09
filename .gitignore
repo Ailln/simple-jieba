@@ -26,7 +26,7 @@ wheels/
 MANIFEST
 
 # PyInstaller
-#  Usually these files are written by a python script from a template
+#  Usually these files are written by a python scripts from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
@@ -115,3 +115,4 @@ files.txt
 # test
 test/icwb2-data/
 test/icwb2-data.zip
+.DS_Store

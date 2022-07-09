@@ -6,19 +6,18 @@ import torbjorn as tbn
 def get_data(name):
     train_data_path = f"./icwb2-data/training/{name}_training.utf8"
     with open(train_data_path, "r") as f_data:
-        datas = f_data.readlines()
-    return datas
+        return f_data.readlines()
 
 
 @tbn.run_time
-def calc(datas, data_name, tool_name, tool):
+def calc(data_list, cut_tool):
     all_num = 0
     true_num = 0
     false_num = 0
 
-    for data in datas:
+    for data in data_list:
         sentence_list = data.strip().split("  ")
-        predict_list = list(tool.cut("".join(sentence_list)))
+        predict_list = list(cut_tool.cut("".join(sentence_list)))
 
         sentence_pos_list = []
         sentence_len = 0
@@ -46,18 +45,15 @@ def calc(datas, data_name, tool_name, tool):
         true_num += true_word_num
         false_num += false_word_num
 
-    print(f"\n## {data_name} | {tool_name}")
-    print(f">> all: {all_num}, true: {true_num}, false: {false_num}, acc: {true_num / all_num}")
-
-
-def run():
-    data_name_list = ["pku", "msr"]
-    for data_name in data_name_list:
-        datas = get_data(data_name)
-        tools = {"jieba": jieba, "simjb": simjb}
-        for tool_name, tool in tools.items():
-            calc(datas, data_name, tool_name, tool)
+    print(f">> all: {all_num}, true: {true_num}, false: {false_num}, acc: {true_num / all_num:.4f}")
 
 
 if __name__ == '__main__':
-    run()
+    data_name_list = ["pku", "msr"]
+    tools = {"jieba": jieba, "simjb": simjb}
+    for data_name in data_name_list:
+        text_data = get_data(data_name)
+        for tool_name, tool in tools.items():
+            print(f"\n## {data_name} | {tool_name}")
+            calc(text_data, tool)
+

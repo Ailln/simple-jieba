@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
-source ~/anaconda3/etc/profile.d/conda.sh
+# shellcheck disable=SC1090
+source ~/opt/anaconda3/etc/profile.d/conda.sh
 
 ## conda env create
 env_list=$(conda env list)
-for env in "py369" "py374" "py383"
+for env in "py3613" "py3711" "py3811"
 do
   if [[ $env_list =~ $env ]]
   then
